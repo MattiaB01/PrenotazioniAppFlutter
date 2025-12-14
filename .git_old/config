@@ -1,0 +1,23 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/MattiaB01/PrenotazioniApp_Flutter.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+[branch "nuove_funzioni"]
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/nuove_funzioni
+[branch "backup_main"]
+	vscode-merge-base = origin/main
+[branch "backup_nuove_funzioni"]
+	vscode-merge-base = origin/nuove_funzioni
+[branch "nuove_funzioni_lineare"]
+	vscode-merge-base = origin/main
