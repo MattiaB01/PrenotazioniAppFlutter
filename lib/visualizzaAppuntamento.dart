@@ -24,6 +24,9 @@ Future<bool?> visualizzaAppuntamento(
 ) {
   Map<String, dynamic> data = jsonDecode(dati);
   _nomeContr.text = data['nome'] ?? "";
+  _telContr.text = data['telefono'] ?? "";
+  _emailContr.text = data['email'] ?? "";
+
   return showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -68,6 +71,7 @@ Future<bool?> visualizzaAppuntamento(
                     tel = value;
                   },
                   readOnly: true,
+                  controller: _telContr,
                   decoration: InputDecoration(
                     labelText: "Telefono",
                     border: OutlineInputBorder(
@@ -81,6 +85,7 @@ Future<bool?> visualizzaAppuntamento(
                     email = value;
                   },
                   readOnly: true,
+                  controller: _emailContr,
                   decoration: InputDecoration(
                     labelText: "Email",
                     border: OutlineInputBorder(

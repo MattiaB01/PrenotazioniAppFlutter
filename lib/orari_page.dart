@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:calendario/api.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -342,7 +343,8 @@ class _OrariPageState extends State<OrariPage> {
   Future<void> caricaOrari() async {
     try {
       final url = Uri.parse(
-        "http://localhost:2000/ottieniOrari",
+        /*"http://localhost:2000/ottieniOrari",*/
+        "$apiUrl/ottieniOrari",
       ); // endpoint GET
       final response = await http.get(url);
 

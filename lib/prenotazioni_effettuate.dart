@@ -154,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {}
   }
 
+  /*
   void aggiorna() async {
     //mostra dialog
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -173,6 +174,37 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       // chiudi dialog
       Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+*/
+  Future<void> aggiorna({bool showLoader = true}) async {
+    if (showLoader) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showLoadingDialog(context);
+      });
+    }
+
+    try {
+      final datiSettimana = await settimana(startOfWeek);
+      final nuovePrenotazioni = await apiAppuntamentiSettimana(startOfWeek);
+      final appuntamenti = await apiAppuntamentiGiorno(startOfWeek);
+
+      if (!mounted) return;
+
+      setState(() {
+        res = datiSettimana;
+        prenotazioniSettimana = nuovePrenotazioni;
+        appuntamentiGiorno = appuntamenti;
+        nomeMese = DateFormat.MMMM().format(startOfWeek);
+        nMese = startOfWeek.month;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      if (showLoader && mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
     }
   }
 
@@ -207,6 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          /*
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -215,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
             icon: Icon(Icons.settings),
-          ),
+          ),*/
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -385,10 +418,74 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           SizedBox(width: 10),
                                                           InkWell(
                                                             onTap: () {
-                                                              apiCancellaAppuntamento(
-                                                                p['id'],
+                                                              final conferma = showDialog<bool>(
+                                                                context:
+                                                                    context,
+                                                                builder: (context) => AlertDialog(
+                                                                  title: const Text(
+                                                                    'Conferma eliminazione',
+                                                                  ),
+                                                                  content:
+                                                                      const Text(
+                                                                        'Sei sicuro di voler eliminare questa prenotazione?',
+                                                                      ),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                      onPressed: () =>
+                                                                          Navigator.of(
+                                                                            context,
+                                                                          ).pop(
+                                                                            false,
+                                                                          ),
+                                                                      child: const Text(
+                                                                        'Annulla',
+                                                                      ),
+                                                                    ),
+                                                                    ElevatedButton(
+                                                                      style: ElevatedButton.styleFrom(
+                                                                        backgroundColor:
+                                                                            Colors.green,
+                                                                      ),
+                                                                      onPressed: () => {
+                                                                        apiCancellaAppuntamento(
+                                                                          p['id'],
+                                                                        ),
+
+                                                                        ScaffoldMessenger.of(
+                                                                          context,
+                                                                        ).showSnackBar(
+                                                                          SnackBar(
+                                                                            content: Text(
+                                                                              'Prenotazione eliminata',
+                                                                            ),
+                                                                            duration: Duration(
+                                                                              seconds: 2,
+                                                                            ),
+
+                                                                            backgroundColor:
+                                                                                Colors.green,
+                                                                          ),
+                                                                        ),
+                                                                        aggiorna(),
+                                                                        Navigator.of(
+                                                                          context,
+                                                                        ).pop(
+                                                                          false,
+                                                                        ),
+                                                                      },
+                                                                      child: const Text(
+                                                                        'Elimina',
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
                                                               );
+
+                                                              if (conferma !=
+                                                                  true)
+                                                                return;
                                                             },
+
                                                             child: Icon(
                                                               Icons.delete,
                                                               size: 18,
@@ -584,6 +681,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   final orarioKey = mattinaMap.keys.elementAt(
                                     index,
                                   );
+
                                   final isAvailable = mattinaMap[orarioKey];
 
                                   return Center(
@@ -606,23 +704,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
                                               // $orarioKey",
                                             );
-                                            http.Response response = await http
-                                                .get(
-                                                  Uri.parse(
-                                                    "${proxy}trovaPrenotazione?data=$soloData&orario=$orarioKey",
-                                                  ),
-                                                )
-                                                .timeout(Duration(seconds: 5));
-                                            datiAppuntamento = response.body;
+                                            try {
+                                              http.Response
+                                              response = await http
+                                                  .get(
+                                                    Uri.parse(
+                                                      "${proxy}trovaPrenotazione?data=$soloData&orario=$orarioKey",
+                                                    ),
+                                                  )
+                                                  .timeout(
+                                                    Duration(seconds: 5),
+                                                  );
+                                              datiAppuntamento = response.body;
+                                            } catch (e) {
+                                              datiAppuntamento = "";
+                                            }
                                             //    print(response.body);
-
-                                            final result =
-                                                await visualizzaAppuntamento(
-                                                  context,
-                                                  orarioKey,
-                                                  settimana[giornoIndex],
-                                                  datiAppuntamento,
-                                                );
+                                            try {
+                                              final result =
+                                                  await visualizzaAppuntamento(
+                                                    context,
+                                                    orarioKey,
+                                                    settimana[giornoIndex],
+                                                    datiAppuntamento,
+                                                  );
+                                            } catch (e) {}
                                           }
                                           aggiorna();
                                         },

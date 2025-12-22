@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'proxy.dart';
 
+const apiUrl = "https://apiprenotazioni.mattiabonfanti.it";
+
 void apiPrenotazione(
   String orario,
   DateTime giorno,
